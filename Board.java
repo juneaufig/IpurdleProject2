@@ -1,9 +1,11 @@
+import java.util.ArrayList;
+
 public class Board {
     private char[] word;
-    private int maxGuesses;
     private int guesses;
-    private String guess;
-    private Clue clue;
+    private int maxGuesses;
+    private ArrayList<String> guesslist = new ArrayList<String>();
+    private ArrayList<Clue> clues = new ArrayList<Clue>();
 
     /**
      * @param wordSize
@@ -37,7 +39,7 @@ public class Board {
      * @return
      */
     public int guesses() {
-        return this.guesses;
+        return guesses = guesslist.size();
     }
 
     /**
@@ -45,17 +47,17 @@ public class Board {
      * @param clue
      */
     public void insertGuessAndClue(String guess, Clue clue) {
-        this.guess = guess;
-        this.clue = clue;
-        this.guesses += 1;
+        guesslist.add(guess);
+        clues.add(clue);
     }
 
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append("+-").append("-".repeat(wordLength()*2+3)).append("-+\n");
-        str.append("| ").append(guess).append(" | ").append(clue.toString()).append(" |\n");
-        str.append("+-").append("-".repeat(wordLength()*2 + 3)).append("-+\n");
-
+        for(int i = 0 ; i < guesses(); i++){
+            str.append("| ").append(guesslist.get(i)).append(" | ").append(clues.get(i).toString()).append(" |\n");
+            str.append("+-").append("-".repeat(wordLength()*2+3)).append("-+\n");
+        }
         return str.toString();
     }
 }
