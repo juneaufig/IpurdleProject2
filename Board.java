@@ -15,7 +15,7 @@ public class Board {
             this.guesses = 0;
             this.maxGuesses = maxGuesses;
         }else if(wordSize<1 || maxGuesses < 1){
-            System.out.println("Word size and max Guesses must be greater than 1.");
+            System.out.println("Word size and max Guesses must be greater or equal to 1.");
         }
     }
 
