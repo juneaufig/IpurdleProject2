@@ -61,6 +61,16 @@ public class Clue {
          return counter;
      }
 
+    public int getOrderNumberWithClueInt(int clueInt) {
+        int clueStart = clueInt;
+        int counter = 1;
+        while (clueStart != minClue(wordSize)) {
+            clueStart = previousClue(clueStart, wordSize);
+            counter++;
+        }
+        return counter;
+    }
+
     /**
      * @return
      */
@@ -89,6 +99,10 @@ public class Clue {
             }
         }
         return sb.toString();
+    }
+
+    public int getClueInt() {
+        return clueInt;
     }
 
     private int intClueFromEnum(LetterStatus[] elements) {
