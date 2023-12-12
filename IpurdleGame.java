@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class IpurdleGame {
     private String[] words;
@@ -7,12 +8,14 @@ public class IpurdleGame {
     private int maxGuesses;
     private int guessesPlayed;
 
+    private int lastClueInt;
+    private boolean hasPlayedARound = false;
 
-    //public String[] wordsList = {"JAVA", "LOOP", "EXIT", "TRUE", "LONG", "THIS", "BREAK", "WHILE", "GRADE", "PUPIL", "FIELD", "BASIC", "ABORT", "ABOVE", "FALSE", "FLOAT", "SHORT", "CLASS", "FINAL", "STATIC", "METHOD", "STRING", "RETURN", "RANDOM", "EQUALS", "OBJECT", "FUNCTION", "VARIABLE", "INTEGER", "SCANNER",};
-    public String[] wordsList = {"BREAK", "WHILE", "GRADE", "PUPIL", "FIELD", "BASIC", "ABORT", "ABOVE", "FALSE", "FLOAT", "SHORT", "CLASS", "FINAL"};
+    public String[] wordsList = {"JAVA", "LOOP", "EXIT", "TRUE", "LONG", "THIS", "BREAK", "WHILE", "GRADE", "PUPIL", "FIELD", "BASIC", "ABORT", "ABOVE", "FALSE", "FLOAT", "SHORT", "CLASS", "FINAL", "STATIC", "METHOD", "STRING", "RETURN", "RANDOM", "EQUALS", "OBJECT", "FUNCTION", "VARIABLE", "INTEGER", "SCANNER",};
+
 
     public static void main(String[] args) {
-        
+
     }
 
     /**
@@ -22,12 +25,10 @@ public class IpurdleGame {
     public IpurdleGame(int wordSize, int maxGuesses) {
         this.wordSize = wordSize;
         this.maxGuesses = maxGuesses;
-        this.words = new String[wordsList.length];
-        for (int i = 0; i < wordsList.length; i++) {
-            words[i] = wordsList[i];
-        }
+        this.words = findWordsWithList(wordsList);
         this.canBeWord = new boolean[words.length];
         Arrays.fill(canBeWord, true);
+        this.guessesPlayed = 0;
     }
 
     /**
@@ -48,7 +49,7 @@ public class IpurdleGame {
      * @return
      */
     public int guesses() {
-        return maxGuesses - guessesPlayed;
+        return guessesPlayed;
     }
 
     /**
@@ -59,7 +60,7 @@ public class IpurdleGame {
         boolean rightSize = (guess.length() == wordSize);
         boolean inDictionary = false;
         for (int i = 0; i < words.length; i++) {
-            if (words[i] == guess) {
+            if (words[i].equals(guess)) {
                 inDictionary = true;
             }
         }
@@ -69,7 +70,8 @@ public class IpurdleGame {
      * @return
      */
     public boolean isOver() {
-        return false;
+
+        return (hasPlayedARound && (guessesPlayed == maxGuesses)) || (hasPlayedARound && isMaxClue(lastClueInt, wordSize));
     }
 
     /**
@@ -83,7 +85,7 @@ public class IpurdleGame {
         clue.append(Integer.toString(minClue(word.length())));
         Clue result;
         for (int i = 0; i < wordSize; i++) {
-            if (word.charAt(i) == guess.charAt(i)) {
+            if (Character.compare(word.charAt(i),guess.charAt(i)) == 0) {
                 clue.deleteCharAt(i);
                 clue.insert(i, 3);
             } else {
@@ -143,6 +145,7 @@ public class IpurdleGame {
      * @return
      */
     public Clue playGuess(String guess) {
+
         Clue result;
         int resultClueIntForGuess = betterClueForGuess(guess);
         for (int i = 0; i < words.length; i++) {
@@ -154,7 +157,12 @@ public class IpurdleGame {
         int resultWordSize = String.valueOf(resultClueIntForGuess).length();
         int resultClueInt = resultClueIntForGuess;
         int resultOrder = getOrderNumberWithClueInt(resultClueInt);
+        lastClueInt = resultClueInt;
         result = new Clue(resultOrder, resultWordSize);
+
+        guessesPlayed++;
+        hasPlayedARound = true;
+
         return result;
     }
 
@@ -304,13 +312,53 @@ public class IpurdleGame {
     private boolean isMaxClue(int clue, int size) {
         boolean maxClue = true;
         int tst = 0;
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             tst = clue % 10;
             clue /= 10;
-            if(tst != 3){
+            if (tst != 3) {
                 maxClue = false;
             }
         }return maxClue;
+    }
+
+    private String[] findWords() {
+        Scanner scanDictionary = new Scanner("Dicionario.txt");
+        Scanner scanForWords = new Scanner("Dicionario.txt");
+        int counterWordsOfSize = 0;
+        while (scanDictionary.hasNextLine()) {
+
+            if (scanDictionary.nextLine().length() == wordSize) {
+                counterWordsOfSize++;
+            }
+        }
+        int i = 0;
+        String[] wordsOfSize = new String[counterWordsOfSize];
+        while (scanForWords.hasNextLine()){
+            String word = scanForWords.nextLine();
+            if (word.length() == wordSize) {
+                wordsOfSize[i] = word;
+            }
+            i++;
+        }
+        return wordsOfSize;
+    }
+
+    private String[] findWordsWithList(String[] list) {
+        int counterWordsOfSize = 0;
+        for (int j = 0; j < list.length; j++) {
+            if (list[j].length() == wordSize) {
+                counterWordsOfSize++;
+            }
+        }
+        int i = 0;
+        String[] wordsOfSize = new String[counterWordsOfSize];
+        for (int k = 0; k < list.length; k++) {
+            if (list[k].length() == wordSize) {
+                wordsOfSize[i] = list[k];
+                i++;
+            }
+        }
+        return wordsOfSize;
     }
 
     public String toString() {
