@@ -7,11 +7,11 @@ public class IpurdleGame {
     private int wordSize;
     private int maxGuesses;
     private int guessesPlayed;
-
     private int lastClueInt;
     private boolean hasPlayedARound = false;
+    private StringBuilder stringGame;
 
-    public String[] wordsList = {"JAVA", "LOOP", "EXIT", "TRUE", "LONG", "THIS", "BREAK", "WHILE", "GRADE", "PUPIL", "FIELD", "BASIC", "ABORT", "ABOVE", "FALSE", "FLOAT", "SHORT", "CLASS", "FINAL", "STATIC", "METHOD", "STRING", "RETURN", "RANDOM", "EQUALS", "OBJECT", "FUNCTION", "VARIABLE", "INTEGER", "SCANNER",};
+    private String[] wordsList = {"JAVA", "LOOP", "EXIT", "TRUE", "LONG", "THIS", "BREAK", "WHILE", "GRADE", "PUPIL", "FIELD", "BASIC", "ABORT", "ABOVE", "FALSE", "FLOAT", "SHORT", "CLASS", "FINAL", "STATIC", "METHOD", "STRING", "RETURN", "RANDOM", "EQUALS", "OBJECT", "FUNCTION", "VARIABLE", "INTEGER", "SCANNER",};
 
 
     public static void main(String[] args) {
@@ -76,72 +76,6 @@ public class IpurdleGame {
 
     /**
      * @param guess
-     * @param word
-     * @return
-     */
-    private Clue clueForGuessAndWord(String guess, String word) {
-        StringBuilder notSamePos = new StringBuilder();
-        StringBuilder clue = new StringBuilder();
-        clue.append(Integer.toString(minClue(word.length())));
-        Clue result;
-        for (int i = 0; i < wordSize; i++) {
-            if (Character.compare(word.charAt(i),guess.charAt(i)) == 0) {
-                clue.deleteCharAt(i);
-                clue.insert(i, 3);
-            } else {
-                notSamePos.append(word.charAt(i));
-            }
-        }
-        for(int j = 0; j < word.length(); j++) {
-            for (int k = 0; k < notSamePos.length(); k++) {
-                if (guess.charAt(j) == notSamePos.charAt(k)) {
-                    clue.deleteCharAt(j);
-                    clue.insert(j, 2);
-                    notSamePos.deleteCharAt(k);
-                }
-            }
-        }
-        int resultWordSize = clue.toString().length();
-        int resultClueInt = Integer.parseInt(clue.toString());
-        int resultOrder = getOrderNumberWithClueInt(resultClueInt);
-        result = new Clue(resultOrder, resultWordSize);
-        return result;
-    }
-
-    private int getOrderNumberWithClueInt(int clueInt) {
-        int clueStart = clueInt;
-        int counter = 1;
-        while (clueStart != minClue(wordSize)) {
-            clueStart = previousClue(clueStart, wordSize);
-            counter++;
-        }
-        return counter;
-    }
-
-    private int previousClue(int clue, int size) {
-        int clueCheck = clue;
-        clue--;
-        clue = clue - minClue(size) + (int) Math.pow(10, size);
-        String clueString = Integer.toString(clue);
-        for (int pos = 1; pos <= wordSize; pos++) {
-            if (clueString.charAt(wordSize+1-pos)=='9') {
-                clue = clue - (int) (7 * Math.pow(10, pos-1));
-            }
-        }
-        clue += minClue(size) - (int) Math.pow(10, size);
-        return clue;
-    }
-
-    private int minClue(int size){
-        int clue = 0;
-        for(int i= 0; i < size; i ++){
-            clue = (clue * 10) + 1;
-        }
-        return clue;
-    }
-
-    /**
-     * @param guess
      * @return
      */
     public Clue playGuess(String guess) {
@@ -160,10 +94,22 @@ public class IpurdleGame {
         lastClueInt = resultClueInt;
         result = new Clue(resultOrder, resultWordSize);
 
+        if (!hasPlayedARound) {
+            stringGame = new StringBuilder("Ipurdle with words of " + wordSize + " letters.\n Remaining guesses: " + (maxGuesses - guessesPlayed) + "\n");
+        }
+        stringGame.append(lineSeparator());
+        stringGame.append("| " + guess.toUpperCase() + " | " + result + " |" + "\n");
+
         guessesPlayed++;
         hasPlayedARound = true;
 
+
         return result;
+    }
+
+    public String toString() {
+        stringGame.append(lineSeparator());
+        return stringGame.toString();
     }
 
     public int betterClueForGuess(String guess) {
@@ -211,7 +157,7 @@ public class IpurdleGame {
      * @param guess guess to check dictionary words against.
      * @param clue clue to check letters in position with 1.
      */
-    public void checkOnes(boolean[] dict, String guess, int clue) {
+    private void checkOnes(boolean[] dict, String guess, int clue) {
         for (int i = 0; i < guess.length(); i++) {
             if ((Integer.toString(clue).charAt(i))=='1') {
                 for (int l = 0; l < dict.length; l++) {
@@ -232,7 +178,7 @@ public class IpurdleGame {
      * @param guess guess to check dictionary words against.
      * @param clue clue to check letters in position with 2.
      */
-    public void checkTwos(boolean[] dict, String guess, int clue) {
+    private void checkTwos(boolean[] dict, String guess, int clue) {
         for (int i = 0; i < guess.length(); i++) {
             if ((Integer.toString(clue).charAt(i))=='2') {
                 for (int k = 0; k < dict.length; k++) {
@@ -262,7 +208,7 @@ public class IpurdleGame {
      * @param guess guess to check dictionary words against.
      * @param clue clue to check letters in position with 3.
      */
-    public void checkThrees(boolean[] dict, String guess, int clue) {
+    private void checkThrees(boolean[] dict, String guess, int clue) {
         for (int i = 0; i < guess.length(); i++) {
             if ((Integer.toString(clue).charAt(i))=='3') {
                 for (int j = 0; j < dict.length; j++) {
@@ -283,7 +229,7 @@ public class IpurdleGame {
      * @return true if {@code c} is in {@code wordToCheck} in {@code pos}.
      * @requires {@code pos} must be less than length of {@code wordToCheck}.
      */
-    public static boolean checkThisLetter(char c, String wordToCheck, int pos) {
+    private static boolean checkThisLetter(char c, String wordToCheck, int pos) {
         boolean letterInWord;
         if (wordToCheck.charAt(pos)==c) {
             letterInWord = true;
@@ -361,7 +307,79 @@ public class IpurdleGame {
         return wordsOfSize;
     }
 
-    public String toString() {
-        return null;
+    private String lineSeparator() {
+        StringBuilder lineSeparator = new StringBuilder("+");
+        for (int i = 0; i < 2*wordSize+5; i++) {
+            lineSeparator.append("-");
+        }
+        lineSeparator.append("+");
+        lineSeparator.append("\n");
+        return lineSeparator.toString();
+    }
+
+    private int getOrderNumberWithClueInt(int clueInt) {
+        int clueStart = clueInt;
+        int counter = 1;
+        while (clueStart != minClue(wordSize)) {
+            clueStart = previousClue(clueStart, wordSize);
+            counter++;
+        }
+        return counter;
+    }
+
+    private int previousClue(int clue, int size) {
+        int clueCheck = clue;
+        clue--;
+        clue = clue - minClue(size) + (int) Math.pow(10, size);
+        String clueString = Integer.toString(clue);
+        for (int pos = 1; pos <= wordSize; pos++) {
+            if (clueString.charAt(wordSize+1-pos)=='9') {
+                clue = clue - (int) (7 * Math.pow(10, pos-1));
+            }
+        }
+        clue += minClue(size) - (int) Math.pow(10, size);
+        return clue;
+    }
+
+    private int minClue(int size){
+        int clue = 0;
+        for(int i= 0; i < size; i ++){
+            clue = (clue * 10) + 1;
+        }
+        return clue;
+    }
+
+    /**
+     * @param guess
+     * @param word
+     * @return
+     */
+    private Clue clueForGuessAndWord(String guess, String word) {
+        StringBuilder notSamePos = new StringBuilder();
+        StringBuilder clue = new StringBuilder();
+        clue.append(Integer.toString(minClue(word.length())));
+        Clue result;
+        for (int i = 0; i < wordSize; i++) {
+            if (Character.compare(word.charAt(i),guess.charAt(i)) == 0) {
+                clue.deleteCharAt(i);
+                clue.insert(i, 3);
+            } else {
+                notSamePos.append(word.charAt(i));
+            }
+        }
+        for(int j = 0; j < word.length(); j++) {
+            for (int k = 0; k < notSamePos.length(); k++) {
+                if (guess.charAt(j) == notSamePos.charAt(k)) {
+                    clue.deleteCharAt(j);
+                    clue.insert(j, 2);
+                    notSamePos.deleteCharAt(k);
+                }
+            }
+        }
+        int resultWordSize = clue.toString().length();
+        int resultClueInt = Integer.parseInt(clue.toString());
+        int resultOrder = getOrderNumberWithClueInt(resultClueInt);
+        result = new Clue(resultOrder, resultWordSize);
+        return result;
     }
 }
