@@ -1,6 +1,14 @@
 import java.util.Scanner;
 
 public class IpurdleTxt {
+    /**
+     * /**
+     * Plays a game of IPurdle, a Intro Programming version of Wordle!
+     * 
+     * @author Dienis Garkavenko 61818 and J. Juneau Wilson 61795
+     * 
+     * @param args first argument is length of words, second argument is number of attempts.
+     */
     public static void main(String[] args){
         Scanner scr = new Scanner(System.in);
         int wordSize = 5;
@@ -19,7 +27,13 @@ public class IpurdleTxt {
         }while(!ipd.isOver());
 
     }
-
+    /**
+     * Asks player to input word, repeats until word is valid.
+     * 
+     * @param ipd Instance of IpurdleGame.
+     * @param scr Scanner where player inputs words from.
+     * @return {@code guess} that is valid. 
+     */
     public static String askForGuess(IpurdleGame ipd, Scanner scr) {
         boolean validWord = false;
         String guess = "";
@@ -39,7 +53,12 @@ public class IpurdleTxt {
         } while (!validWord);
         return guess;
     }
-
+    /**
+     * Writes welcome message for player.
+     * 
+     * @param wordSize size of words in this game.
+     * @param maxGuesses maximum amount of guesses allowed.
+     */
     public static void welcomeMessage(int wordSize, int maxAttempts) {
         System.out.println("");
         System.out.println("");
